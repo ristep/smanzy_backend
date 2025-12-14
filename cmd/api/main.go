@@ -45,7 +45,7 @@ func main() {
 	}
 
 	// Auto-migrate models
-	if err := db.AutoMigrate(&models.User{}, &models.Role{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Role{}, &models.Media{}); err != nil {
 		log.Fatalf("Failed to auto-migrate models: %v", err)
 	}
 
@@ -61,6 +61,7 @@ func main() {
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(db, jwtService)
 	userHandler := handlers.NewUserHandler(db)
+	mediaHandler := handlers.NewMediaHandler(db)
 
 	// Create Gin router
 	router := gin.Default()
@@ -105,6 +106,15 @@ func main() {
 			users.DELETE("/:id", userHandler.DeleteUserHandler)
 			users.POST("/:id/roles", userHandler.AssignRoleHandler)
 			users.DELETE("/:id/roles", userHandler.RemoveRoleHandler)
+		}
+
+		// Media routes
+		media := protectedAPI.Group("/media")
+		{
+			media.POST("", mediaHandler.UploadHandler)            // Upload
+			media.GET("/:id", mediaHandler.GetMediaHandler)       // Download (Read-only for others)
+			media.PUT("/:id", mediaHandler.UpdateMediaHandler)    // Edit (Owner/Admin)
+			media.DELETE("/:id", mediaHandler.DeleteMediaHandler) // Delete (Owner/Admin)
 		}
 	}
 
