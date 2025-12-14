@@ -36,8 +36,8 @@ run:
 
 # Development mode with hot reload (requires air)
 dev:
-	@command -v air >/dev/null 2>&1 || go install github.com/cosmtrek/air@latest
-	air
+	@command -v air >/dev/null 2>&1 || go install github.com/air-verse/air@latest
+	@PATH=$$(go env GOPATH)/bin:$$PATH air
 
 # Run tests
 test:
@@ -58,7 +58,7 @@ lint:
 # Install development tools
 install-tools:
 	@echo "Installing development tools..."
-	go install github.com/cosmtrek/air@latest
+	go install github.com/air-verse/air@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 # Clean build artifacts

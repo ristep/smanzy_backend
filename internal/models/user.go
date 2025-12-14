@@ -39,3 +39,13 @@ type Role struct {
 func (Role) TableName() string {
 	return "roles"
 }
+
+// HasRole checks if the user has a specific role
+func (u *User) HasRole(roleName string) bool {
+	for _, role := range u.Roles {
+		if role.Name == roleName {
+			return true
+		}
+	}
+	return false
+}
