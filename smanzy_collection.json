@@ -182,6 +182,33 @@
                     "response": []
                 },
                 {
+                    "name": "List Public Media",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/media?limit=10&offset=0",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "media"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "offset",
+                                    "value": "0"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
                     "name": "Get Media",
                     "request": {
                         "auth": {
