@@ -183,7 +183,25 @@
                 },
                 {
                     "name": "List Public Media",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "var jsonData = pm.response.json();",
+                                    "if (Array.isArray(jsonData.data) && jsonData.data.length > 0) {",
+                                    "    pm.environment.set(\"public_media_id\", jsonData.data[0].id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
+                        "description": "Returns a paginated list of public media items (no auth required). Supports query params: limit and offset.",
                         "method": "GET",
                         "header": [],
                         "url": {
@@ -209,6 +227,7 @@
                     },
                     "response": []
                 },
+                {
                     "name": "Get Media",
                     "request": {
                         "auth": {

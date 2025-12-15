@@ -104,6 +104,30 @@ func (mh *MediaHandler) GetMediaHandler(c *gin.Context) {
 	c.File(filePath)
 }
 
+// ServeFileHandler serves files directly from the uploads directory for
+// development. Production should serve these via nginx or another static
+// file server for performance.
+func (mh *MediaHandler) ServeFileHandler(c *gin.Context) {
+	name := c.Param("name")
+
+	// Prevent path traversal: the provided name must be the base name
+	if filepath.Base(name) != name {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid filename"})
+		return
+	}
+
+	filePath := filepath.Join(mh.uploadDir, name)
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		c.JSON(http.StatusNotFound, ErrorResponse{Error: "File not found"})
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Filesystem error"})
+		return
+	}
+
+	c.File(filePath)
+}
+
 // ListPublicMediasHandler returns a paginated list of medias for public consumption
 // Query params: limit (default 100), offset (default 0)
 func (mh *MediaHandler) ListPublicMediasHandler(c *gin.Context) {

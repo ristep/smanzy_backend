@@ -86,6 +86,9 @@ func main() {
 		}
 		// Public media listing
 		api.GET("/media", mediaHandler.ListPublicMediasHandler)
+		// Serve uploaded files directly in development. In production, serve
+		// `/api/media/files/*` from nginx pointing at the uploads directory.
+		api.GET("/media/files/:name", mediaHandler.ServeFileHandler)
 	}
 
 	// Protected routes (requires authentication)
