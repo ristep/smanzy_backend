@@ -222,6 +222,31 @@ Response (200 OK):
     "refresh_token": "eyJhbGc..."
   }
 }
+
+#### List Public Media
+
+```
+GET /api/media?limit=100&offset=0
+
+Response (200 OK):
+{
+  "data": [
+    {
+      "id": 1,
+      "filename": "image.jpg",
+      "url": "/api/media/files/1_1600000000.jpg",
+      "type": "file",
+      "mime_type": "image/jpeg",
+      "size": 12345,
+      "created_at": 1702324800000
+    }
+  ]
+}
+```
+
+Notes:
+- `limit` and `offset` query parameters are supported for pagination. Defaults: `limit=100`, `offset=0`.
+- This endpoint is public (no authentication required) and returns basic metadata only.
 ```
 
 ### Protected Endpoints

@@ -84,6 +84,8 @@ func main() {
 			auth.POST("/login", authHandler.LoginHandler)
 			auth.POST("/refresh", authHandler.RefreshHandler)
 		}
+		// Public media listing
+		api.GET("/media", mediaHandler.ListPublicMediasHandler)
 	}
 
 	// Protected routes (requires authentication)
@@ -116,6 +118,7 @@ func main() {
 			media.PUT("/:id", mediaHandler.UpdateMediaHandler)    // Edit (Owner/Admin)
 			media.DELETE("/:id", mediaHandler.DeleteMediaHandler) // Delete (Owner/Admin)
 		}
+
 	}
 
 	// Start server

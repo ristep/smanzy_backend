@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -101,6 +102,32 @@ func (mh *MediaHandler) GetMediaHandler(c *gin.Context) {
 
 	filePath := filepath.Join(mh.uploadDir, media.StoredName)
 	c.File(filePath)
+}
+
+// ListPublicMediasHandler returns a paginated list of medias for public consumption
+// Query params: limit (default 100), offset (default 0)
+func (mh *MediaHandler) ListPublicMediasHandler(c *gin.Context) {
+	limit := 100
+	offset := 0
+
+	if l := c.Query("limit"); l != "" {
+		if v, err := strconv.Atoi(l); err == nil && v > 0 {
+			limit = v
+		}
+	}
+	if o := c.Query("offset"); o != "" {
+		if v, err := strconv.Atoi(o); err == nil && v >= 0 {
+			offset = v
+		}
+	}
+
+	var medias []models.Media
+	if err := mh.db.Select("id, filename, url, type, mime_type, size, created_at").Order("created_at desc").Limit(limit).Offset(offset).Find(&medias).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, SuccessResponse{Data: medias})
 }
 
 // UpdateMediaRequest represents payload for updating media

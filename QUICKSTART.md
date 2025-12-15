@@ -46,7 +46,7 @@ createdb smanzy_db
 Edit `.env` with your PostgreSQL credentials:
 
 ```env
-DB_DSN=postgres://user:password@localhost:5432/smanzy_db?sslmode=disable
+DB_DSN=postgres://user:password@localhost:5432/smanzy_postgres?sslmode=disable
 JWT_SECRET=your-super-secret-key
 SERVER_PORT=8080
 ```
@@ -150,7 +150,7 @@ make install-tools     # Install development tools
 
 ```bash
 # Install air (hot reload tool)
-go install github.com/cosmtrek/air@latest
+go install github.com/air-verse/air@latest
 
 # Run with auto-reload
 make dev
