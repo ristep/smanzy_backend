@@ -156,6 +156,41 @@ Response: {"status": "ok"}
 
 ### Public Endpoints
 
+- **Serving uploaded media files**: In development the API exposes `GET /api/media/files/:name` which serves files from the local `uploads` directory. For production, serve `/api/media/files/` directly from **nginx** (or another static file server) pointed at the `uploads` directory for much better performance.
+
+**Example nginx configuration (production)**
+
+This is a minimal example to serve `/api/media/files/*` directly from the `uploads` folder and let nginx handle ranges, caching, and TLS. Adjust paths, security, and headers for your environment.
+
+```
+server {
+  listen 80;
+  server_name example.com;
+
+  # Serve uploaded media directly
+  location /api/media/files/ {
+    alias /srv/smanzy/uploads/;    # <--- point to your uploads directory, trailing slash is important
+    access_log off;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    # Optional: enable byte-range requests for video seeking
+    sendfile on;
+  }
+
+  # Proxy other API requests to the Go app
+  location /api/ {
+    proxy_pass http://127.0.0.1:8080;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  # TODO: add SSL/TLS and other production settings
+}
+```
+
+The same config is available as a ready-to-copy file at [deploy/nginx/smanzy_media.conf](deploy/nginx/smanzy_media.conf).
+
 #### Register a New User
 
 ```
