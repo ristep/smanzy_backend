@@ -9,7 +9,7 @@ A complete, production-ready REST API for user management with JWT authenticatio
 ## Project Statistics
 
 - **Total Go Code**: 845 lines
-- **Files**: 
+- **Files**:
   - 5 Go source files
   - 3 Documentation files
   - Configuration files (go.mod, go.sum, .env, Makefile, docker-compose.yml)
@@ -17,6 +17,7 @@ A complete, production-ready REST API for user management with JWT authenticatio
 ## Architecture & Tech Stack
 
 ### Core Technologies
+
 - **Web Framework**: Gin (high-performance HTTP framework)
 - **JWT Library**: golang-jwt/jwt/v5 (maintained JWT standard)
 - **ORM**: GORM with PostgreSQL driver
@@ -50,6 +51,7 @@ um_starter_jwt_go/
 ## Key Features Implemented
 
 ### 1. User Management
+
 - User registration with email validation
 - Secure password hashing with bcrypt
 - User profile retrieval
@@ -57,6 +59,7 @@ um_starter_jwt_go/
 - Soft delete support (GORM)
 
 ### 2. Authentication
+
 - JWT token generation (access + refresh tokens)
 - Access token lifetime: 15 minutes
 - Refresh token lifetime: 7 days
@@ -64,6 +67,7 @@ um_starter_jwt_go/
 - Bearer token extraction from headers
 
 ### 3. Authorization (RBAC)
+
 - Default roles: "user" and "admin"
 - Role-based middleware for route protection
 - Multiple role support per route
@@ -76,11 +80,13 @@ um_starter_jwt_go/
   - DELETE /api/users/:id/roles (remove role)
 
 ### 4. Database Models
+
 - **User**: ID, Email (unique), Password (hashed), Name, Roles, CreatedAt, UpdatedAt, DeletedAt
 - **Role**: ID, Name (unique), Users association, timestamps
 - Many-to-many relationship between User and Role via join table
 
 ### 5. Security Features
+
 - Password hashing with bcrypt (10-round default cost)
 - JWT signed with HMAC-SHA256
 - Signing method validation (prevents algorithm confusion)
@@ -92,15 +98,18 @@ um_starter_jwt_go/
 ### 6. API Routes
 
 #### Public Routes
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/refresh` - Token refresh
 - `GET /health` - Health check
 
 #### Protected Routes (Authenticated)
+
 - `GET /api/profile` - Get current user profile
 
 #### Admin-Only Routes
+
 - `GET /api/users` - List all users
 - `GET /api/users/:id` - Get specific user
 - `PUT /api/users/:id` - Update user
@@ -111,17 +120,20 @@ um_starter_jwt_go/
 ## Code Organization
 
 ### Models (34 lines)
+
 - GORM struct definitions for User and Role
 - Proper JSON tags and relationships
 - Field validation and constraints
 
 ### JWT Service (118 lines)
+
 - Token pair generation (access + refresh)
 - Token validation with signature verification
 - Custom claims structure with user details
 - Role claims included in tokens
 
 ### Authentication Handlers (456 lines)
+
 - RegisterHandler: Email validation, password hashing, default role assignment
 - LoginHandler: Credential validation, password comparison
 - RefreshHandler: Token refresh with database user verification
@@ -130,11 +142,13 @@ um_starter_jwt_go/
 - RoleHandler: Role assignment and removal
 
 ### Middleware (120 lines)
+
 - AuthMiddleware: JWT extraction, validation, context attachment
 - RoleMiddleware: Role-based access control
 - CORSMiddleware: CORS header handling
 
 ### Main Application (117 lines)
+
 - Environment configuration loading
 - Database connection initialization
 - Auto-migration of models
@@ -147,21 +161,25 @@ um_starter_jwt_go/
 ### Quick Start (3 minutes)
 
 1. **Setup PostgreSQL with Docker**
+
    ```bash
    docker-compose up -d
    ```
 
 2. **Install dependencies**
+
    ```bash
    go mod download
    ```
 
 3. **Run the application**
+
    ```bash
    go run cmd/api/main.go
    ```
 
 4. **Test the API**
+
    ```bash
    # Register
    curl -X POST http://localhost:8080/api/auth/register \
@@ -172,6 +190,7 @@ um_starter_jwt_go/
 ### Complete Setup Guide
 
 See `QUICKSTART.md` for detailed setup instructions including:
+
 - Local PostgreSQL setup
 - Environment configuration
 - Docker setup
@@ -181,6 +200,7 @@ See `QUICKSTART.md` for detailed setup instructions including:
 ## Documentation
 
 ### README.md (9.7 KB)
+
 - Complete API documentation
 - Endpoint details with request/response examples
 - Authentication flow explanation
@@ -190,6 +210,7 @@ See `QUICKSTART.md` for detailed setup instructions including:
 - Development guidelines
 
 ### QUICKSTART.md (5 KB)
+
 - Fast setup in 3 minutes
 - Docker setup instructions
 - Basic testing examples
@@ -197,6 +218,7 @@ See `QUICKSTART.md` for detailed setup instructions including:
 - Troubleshooting section
 
 ### TESTING.md (8 KB)
+
 - Comprehensive API testing guide
 - cURL examples for all endpoints
 - Postman collection template
@@ -207,6 +229,7 @@ See `QUICKSTART.md` for detailed setup instructions including:
 ## Build & Deployment
 
 ### Build Binary
+
 ```bash
 make build
 # or
@@ -214,11 +237,13 @@ go build -o bin/smanzy cmd/api/main.go
 ```
 
 ### Verification
+
 ✅ Code compiles successfully (845 lines of Go)
 ✅ All dependencies resolved (go.sum generated)
 ✅ Binary built: 20 MB executable
 
 ### Make Targets Available
+
 - `make build` - Build application
 - `make run` - Run application
 - `make test` - Run tests
@@ -259,6 +284,7 @@ go.sum                 8.5 KB  (Module checksums)
 ## Dependencies (10 Core Dependencies)
 
 Direct Dependencies:
+
 - github.com/gin-gonic/gin (HTTP framework)
 - github.com/golang-jwt/jwt/v5 (JWT tokens)
 - github.com/joho/godotenv (Environment variables)
@@ -289,6 +315,7 @@ Plus 28 indirect dependencies (all managed by go mod)
 ## Next Steps for Enhancement
 
 ### Optional Additions
+
 1. **Logging**: Integrate Zap or Logrus for structured logging
 2. **Testing**: Add unit tests and integration tests
 3. **Validation**: Enhanced input validation with validators
@@ -302,7 +329,7 @@ Plus 28 indirect dependencies (all managed by go mod)
 
 ## Module Naming Note
 
-The project uses `github.com/ristep/smanzy_backend` as the module name. 
+The project uses `github.com/ristep/smanzy_backend` as the module name.
 To use in production, replace `yourusername` with your actual GitHub username or organization:
 
 ```bash
@@ -335,10 +362,10 @@ go mod graph
 
 ## Support & Resources
 
-- **Gin Documentation**: https://gin-gonic.com/
-- **JWT Documentation**: https://github.com/golang-jwt/jwt
-- **GORM Documentation**: https://gorm.io/
-- **Go Best Practices**: https://golang.org/doc/effective_go
+- **Gin Documentation**: <https://gin-gonic.com/>
+- **JWT Documentation**: <https://github.com/golang-jwt/jwt>
+- **GORM Documentation**: <https://gorm.io/>
+- **Go Best Practices**: <https://golang.org/doc/effective_go>
 
 ## License
 
