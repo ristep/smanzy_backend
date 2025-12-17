@@ -2,20 +2,30 @@ package models
 
 import "gorm.io/gorm"
 
-// Media represents a media file in the system
+// Media represents a media file uploaded to the system
+// It tracks file metadata and links to the physical file storage.
 type Media struct {
-	ID         uint           `gorm:"primaryKey" json:"id"`
-	Filename   string         `gorm:"not null" json:"filename"`
-	StoredName string         `gorm:"not null" json:"stored_name"`
-	URL        string         `gorm:"not null" json:"url"`
-	Type       string         `json:"type"`      // e.g., "image", "video"
-	MimeType   string         `json:"mime_type"` // e.g., "image/jpeg"
-	Size       int64          `json:"size"`      // in bytes
-	UserID     uint           `json:"user_id"`   // Uploaded by
-	UploadedBy User           `gorm:"foreignKey:UserID" json:"-"`
-	CreatedAt  int64          `gorm:"autoCreateTime:milli" json:"created_at"`
-	UpdatedAt  int64          `gorm:"autoUpdateTime:milli" json:"updated_at"`
-	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
+	ID         uint   `gorm:"primaryKey" json:"id"`
+	Filename   string `gorm:"not null" json:"filename"`    // Original name of the file
+	StoredName string `gorm:"not null" json:"stored_name"` // Unique name on disk (to prevent overwrites)
+	URL        string `gorm:"not null" json:"url"`         // Public URL to access the file
+
+	Type     string `json:"type"`      // General category (e.g., "image", "video")
+	MimeType string `json:"mime_type"` // Specific MIME type (e.g., "image/jpeg", "application/pdf")
+	Size     int64  `json:"size"`      // File size in bytes
+
+	// Foreign Keys
+	// UserID links this media file to a specific User
+	UserID uint `json:"user_id"`
+
+	// UploadedBy is the actual User struct that corresponds to UserID.
+	// gorm:"foreignKey:UserID" tells GORM how to link the two.
+	// json:"-" prevents endless recursion or exposing too much user info when listing media.
+	UploadedBy User `gorm:"foreignKey:UserID" json:"-"`
+
+	CreatedAt int64          `gorm:"autoCreateTime:milli" json:"created_at"`
+	UpdatedAt int64          `gorm:"autoUpdateTime:milli" json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 // TableName specifies the table name for Media
