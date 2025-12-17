@@ -1,4 +1,4 @@
-# User Management API with JWT Authentication
+# Smanzy API with JWT Authentication
 
 A production-ready REST API in Go featuring secure user management, role-based access control (RBAC), and JWT authentication.
 
@@ -112,28 +112,28 @@ docker-compose up -d
 
 2. Visit pgAdmin:
 
-  - URL: `http://localhost:5050`
-  - **Default pgAdmin credentials (from docker-compose)**:
-    - Email: `ristep@gmail.com`
-    - Password: `Leprakon!2025`
+- URL: `http://localhost:5050`
+- **Default pgAdmin credentials (from docker-compose)**:
+  - Email: `ristep@gmail.com`
+  - Password: `Leprakon!2025`
 
 3. Add a Server to pgAdmin (recommended):
 
-  - General:
-    - Name: `smanzy_postgres` (or any friendly name)
-  - Connection:
-    - Host name/address: `postgres` (Required when running in Docker)
+- General:
+  - Name: `smanzy_postgres` (or any friendly name)
+- Connection:
+  - Host name/address: `postgres` (Required when running in Docker)
       (Do NOT use `localhost` inside Docker network)
-    - Port: `5432`
-    - Username: `postgres`
-    - Password: `postgres`
-    - Maintenance DB: `postgres` or `smanzy_db`
-    - Save password: ✓
+  - Port: `5432`
+  - Username: `postgres`
+  - Password: `postgres`
+  - Maintenance DB: `postgres` or `smanzy_db`
+  - Save password: ✓
 
 4. Pre-configured servers file
 
-  - A sample `servers.json` is included at `docker/pgadmin/servers.json`. This is mounted into the container at `/pgadmin4/servers.json`, so pgAdmin will show the `smanzy_postgres` server by default.
-  - If you change the postgres service name in `docker-compose.yml`, be sure to update `docker/pgadmin/servers.json` as well.
+- A sample `servers.json` is included at `docker/pgadmin/servers.json`. This is mounted into the container at `/pgadmin4/servers.json`, so pgAdmin will show the `smanzy_postgres` server by default.
+- If you change the postgres service name in `docker-compose.yml`, be sure to update `docker/pgadmin/servers.json` as well.
 
 5. Restart to pick up changes and server config:
 
@@ -261,6 +261,7 @@ Response (200 OK):
 #### List Public Media
 
 ```
+
 GET /api/media?limit=100&offset=0
 
 Response (200 OK):
@@ -277,6 +278,7 @@ Response (200 OK):
     }
   ]
 }
+
 ```
 
 Notes:
