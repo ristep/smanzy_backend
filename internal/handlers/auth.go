@@ -282,6 +282,36 @@ func (ah *AuthHandler) UpdateProfileHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, SuccessResponse{Data: userObj})
 }
 
+// DeleteProfileHandler deletes the current user's profile
+func (ah *AuthHandler) DeleteProfileHandler(c *gin.Context) {
+	// Get user from context
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "Unauthorized"})
+		return
+	}
+
+	userObj := user.(*models.User)
+
+	// In GORM, when deleting an object that has Many-to-Many relationships (like Roles),
+	// we should clear the associations first or ensure the join table is handled.
+	// For a full delete of the user, we also need to be careful with the Soft Delete.
+
+	// 1. Clear roles association
+	if err := ah.db.Model(userObj).Association("Roles").Clear(); err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to clear roles"})
+		return
+	}
+
+	// 2. Delete the user (this will be a soft delete because of DeletedAt field)
+	if err := ah.db.Delete(userObj).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to delete profile"})
+		return
+	}
+
+	c.JSON(http.StatusOK, SuccessResponse{Data: map[string]string{"message": "Profile deleted successfully"}})
+}
+
 // UserHandler represents handlers for user management
 type UserHandler struct {
 	db *gorm.DB
