@@ -2,9 +2,9 @@
 
 ## Overview
 
-A complete, production-ready REST API for user management with JWT authentication and role-based access control (RBAC) has been generated in Go.
+A complete, production-ready REST API for user management with JWT authentication, role-based access control (RBAC), and media management has been generated in Go.
 
-**Project Path**: `/home/ristep/Development/go/um_starter_jwt_go`
+**Project Path**: `/home/ristep/Development/go/smanzy_backend`
 
 ## Project Statistics
 
@@ -26,8 +26,8 @@ A complete, production-ready REST API for user management with JWT authenticatio
 
 ### Project Structure
 
-```
-um_starter_jwt_go/
+```text
+smanzy_backend/
 ├── cmd/api/
 │   └── main.go                    # Application entry point
 ├── internal/
@@ -161,24 +161,27 @@ um_starter_jwt_go/
 ### Quick Start (3 minutes)
 
 1. **Setup PostgreSQL with Docker**
+   1. Start the containers:
 
    ```bash
    docker-compose up -d
    ```
 
-2. **Install dependencies**
+2. Visit pgAdmin at `http://localhost:5050` with the credentials specified in `docker-compose.yml`.
+
+3. **Install dependencies**
 
    ```bash
    go mod download
    ```
 
-3. **Run the application**
+4. **Run the application**
 
    ```bash
    go run cmd/api/main.go
    ```
 
-4. **Test the API**
+5. **Test the API**
 
    ```bash
    # Register
@@ -270,7 +273,7 @@ go build -o bin/smanzy cmd/api/main.go
 
 ## File Sizes
 
-```
+```text
 README.md              9.7 KB  (API documentation)
 TESTING.md             8.0 KB  (Testing guide)
 Makefile               1.8 KB  (Development tasks)
