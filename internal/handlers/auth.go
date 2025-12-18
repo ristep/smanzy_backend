@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -233,6 +234,54 @@ func (ah *AuthHandler) ProfileHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, SuccessResponse{Data: userObj})
 }
 
+// UpdateProfileHandler updates the current user's profile
+func (ah *AuthHandler) UpdateProfileHandler(c *gin.Context) {
+	var req UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid input"})
+		return
+	}
+
+	// Get user from context
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "Unauthorized"})
+		return
+	}
+
+	userObj := user.(*models.User)
+
+	// Update fields
+	if req.Name != "" {
+		userObj.Name = req.Name
+	}
+	if req.Tel != "" {
+		userObj.Tel = req.Tel
+	}
+	if req.Age != 0 {
+		userObj.Age = req.Age
+	}
+	if req.Address != "" {
+		userObj.Address = req.Address
+	}
+	if req.City != "" {
+		userObj.City = req.City
+	}
+	if req.Country != "" {
+		userObj.Country = req.Country
+	}
+	if req.Gender != "" {
+		userObj.Gender = req.Gender
+	}
+
+	if err := ah.db.Save(userObj).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to update profile"})
+		return
+	}
+
+	c.JSON(http.StatusOK, SuccessResponse{Data: userObj})
+}
+
 // UserHandler represents handlers for user management
 type UserHandler struct {
 	db *gorm.DB
@@ -303,7 +352,7 @@ func (uh *UserHandler) UpdateUserHandler(c *gin.Context) {
 	currentUserObj := currentUser.(*models.User)
 
 	// Check if user is trying to update someone else (must be admin)
-	if userID != string(rune(currentUserObj.ID)) {
+	if userID != strconv.FormatUint(uint64(currentUserObj.ID), 10) {
 		// Check if current user is admin
 		isAdmin := false
 		for _, role := range currentUserObj.Roles {
