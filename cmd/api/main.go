@@ -118,7 +118,8 @@ func main() {
 		// Authenticated User routes
 		profile := protectedAPI.Group("/profile")
 		{
-			profile.GET("", authHandler.ProfileHandler) // Get current user profile
+			profile.GET("", authHandler.ProfileHandler)       // Get current user profile
+			profile.PUT("", authHandler.UpdateProfileHandler) // Update current user profile
 		}
 
 		// Admin-only routes
