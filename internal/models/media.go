@@ -32,3 +32,5 @@ type Media struct {
 func (Media) TableName() string {
 	return "media"
 }
+
+// end of Media struct
