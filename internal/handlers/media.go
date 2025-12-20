@@ -104,6 +104,23 @@ func (mh *MediaHandler) GetMediaHandler(c *gin.Context) {
 	c.File(filePath)
 }
 
+// GetMediaDetailsHandler returns media metadata
+func (mh *MediaHandler) GetMediaDetailsHandler(c *gin.Context) {
+	mediaID := c.Param("id")
+
+	var media models.Media
+	if err := mh.db.First(&media, mediaID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, ErrorResponse{Error: "Media not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, SuccessResponse{Data: media})
+}
+
 // ServeFileHandler serves files directly from the uploads directory for
 // development. Production should serve these via nginx or another static
 // file server for performance.
@@ -146,7 +163,7 @@ func (mh *MediaHandler) ListPublicMediasHandler(c *gin.Context) {
 	}
 
 	var medias []models.Media
-	if err := mh.db.Select("id, filename, url, type, mime_type, size, created_at").Order("created_at desc").Limit(limit).Offset(offset).Find(&medias).Error; err != nil {
+	if err := mh.db.Select("id, filename, url, type, mime_type, size, created_at, user_id").Order("created_at desc").Limit(limit).Offset(offset).Find(&medias).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Database error"})
 		return
 	}
@@ -159,15 +176,9 @@ type UpdateMediaRequest struct {
 	Filename string `json:"filename"`
 }
 
-// UpdateMediaHandler updates media metadata
+// UpdateMediaHandler updates media metadata and optionally replaces the file
 func (mh *MediaHandler) UpdateMediaHandler(c *gin.Context) {
 	mediaID := c.Param("id")
-	var req UpdateMediaRequest
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid input"})
-		return
-	}
 
 	// Get current user
 	authUser, exists := c.Get("user")
@@ -193,9 +204,53 @@ func (mh *MediaHandler) UpdateMediaHandler(c *gin.Context) {
 		return
 	}
 
+	// Check if content type is JSON
+	contentType := c.GetHeader("Content-Type")
+	var newFilename string
+
+	if contentType == "application/json" {
+		var req UpdateMediaRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid input"})
+			return
+		}
+		newFilename = req.Filename
+	} else {
+		// Handle multipart/form-data
+		newFilename = c.PostForm("filename")
+
+		// Check for file replacement
+		file, err := c.FormFile("file")
+		if err == nil {
+			// 1. Delete old file from disk
+			oldPath := filepath.Join(mh.uploadDir, media.StoredName)
+			if err := os.Remove(oldPath); err != nil && !os.IsNotExist(err) {
+				// Log warning but continue
+				fmt.Printf("Warning: Failed to delete old file %s: %v\n", oldPath, err)
+			}
+
+			// 2. Save new file
+			ext := filepath.Ext(file.Filename)
+			uniqueName := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), ext)
+			dst := filepath.Join(mh.uploadDir, uniqueName)
+
+			if err := c.SaveUploadedFile(file, dst); err != nil {
+				c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to save new file"})
+				return
+			}
+
+			// 3. Update media details
+			media.StoredName = uniqueName
+			media.URL = "/api/media/files/" + uniqueName
+			media.MimeType = file.Header.Get("Content-Type")
+			media.Size = file.Size
+			// Note: We don't automatically update Filename unless provided in form
+		}
+	}
+
 	// Update fields
-	if req.Filename != "" {
-		media.Filename = req.Filename
+	if newFilename != "" {
+		media.Filename = newFilename
 	}
 
 	if err := mh.db.Save(&media).Error; err != nil {
