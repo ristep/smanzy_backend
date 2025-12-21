@@ -162,13 +162,23 @@ func (mh *MediaHandler) ListPublicMediasHandler(c *gin.Context) {
 		}
 	}
 
+	// Count total records for pagination
+	var total int64
+	if err := mh.db.Model(&models.Media{}).Count(&total).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Database error"})
+		return
+	}
+
 	var medias []models.Media
 	if err := mh.db.Select("id, filename, url, type, mime_type, size, created_at, user_id").Order("created_at desc").Limit(limit).Offset(offset).Find(&medias).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Database error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, SuccessResponse{Data: medias})
+	c.JSON(http.StatusOK, SuccessResponse{Data: map[string]interface{}{
+		"files": medias,
+		"total": total,
+	}})
 }
 
 // UpdateMediaRequest represents payload for updating media
