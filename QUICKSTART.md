@@ -99,6 +99,44 @@ curl -X GET http://localhost:8080/api/profile \
   -H "Authorization: Bearer <ACCESS_TOKEN>"
 ```
 
+### 4. Upload Media
+
+```bash
+curl -X POST http://localhost:8080/api/media \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  -F "file=@/path/to/image.jpg"
+```
+
+### 5. Create Album
+
+```bash
+curl -X POST http://localhost:8080/api/albums \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My Album",
+    "description": "Album description"
+  }'
+```
+
+### 6. Add Media to Album
+
+```bash
+curl -X POST http://localhost:8080/api/albums/1/media \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "media_id": 1
+  }'
+```
+
+### 7. Get User Albums
+
+```bash
+curl -X GET http://localhost:8080/api/albums \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+```
+
 ## Create Admin User
 
 Manually add admin role to a user via database or API:
@@ -240,6 +278,73 @@ curl -X POST http://localhost:8080/api/auth/refresh \
   -d '{
     "refresh_token": "<YOUR_REFRESH_TOKEN>"
   }'
+```
+
+### Create Album
+```bash
+curl -X POST http://localhost:8080/api/albums \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My Album",
+    "description": "Album description"
+  }'
+```
+
+### Get All User Albums
+```bash
+curl -X GET http://localhost:8080/api/albums \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
+```
+
+### Get Specific Album
+```bash
+curl -X GET http://localhost:8080/api/albums/1 \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
+```
+
+### Update Album
+```bash
+curl -X PUT http://localhost:8080/api/albums/1 \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Title",
+    "description": "Updated description"
+  }'
+```
+
+### Upload Media File
+```bash
+curl -X POST http://localhost:8080/api/media \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
+  -F "file=@/path/to/image.jpg"
+```
+
+### Add Media to Album
+```bash
+curl -X POST http://localhost:8080/api/albums/1/media \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "media_id": 1
+  }'
+```
+
+### Remove Media from Album
+```bash
+curl -X DELETE http://localhost:8080/api/albums/1/media \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "media_id": 1
+  }'
+```
+
+### Delete Album
+```bash
+curl -X DELETE http://localhost:8080/api/albums/1 \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
 ```
 
 ## Support

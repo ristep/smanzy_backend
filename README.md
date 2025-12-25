@@ -21,10 +21,14 @@ smanzy_backend/
 ├── internal/
 │   ├── models/
 │   │   ├── user.go                 # User and Role data models
-│   │   └── media.go                # Media data model
+│   │   ├── media.go                # Media data model
+│   │   └── album.go                # Album data model with many-to-many media relationship
 │   ├── handlers/
 │   │   ├── auth.go                 # HTTP handlers for auth and user management
-│   │   └── media.go                # HTTP handlers for media management
+│   │   ├── media.go                # HTTP handlers for media management
+│   │   └── album.go                # HTTP handlers for album management
+│   ├── services/
+│   │   └── album.go                # Business logic for album operations
 │   ├── middleware/
 │   │   ├── auth.go                 # JWT and RBAC middleware
 │   │   └── cors.go                 # CORS configuration
@@ -203,6 +207,72 @@ Content-Type: application/json
 
 ```http
 DELETE /api/media/:id
+```
+
+### Album Management Endpoints (Requires JWT)
+
+#### Create a New Album
+
+```http
+POST /api/albums
+Content-Type: application/json
+
+{
+  "title": "My Vacation",
+  "description": "Summer 2025 photos"
+}
+```
+
+#### Get All User Albums
+
+```http
+GET /api/albums
+```
+
+#### Get Specific Album with Media
+
+```http
+GET /api/albums/:id
+```
+
+#### Update Album Details
+
+```http
+PUT /api/albums/:id
+Content-Type: application/json
+
+{
+  "title": "Updated Title",
+  "description": "Updated description"
+}
+```
+
+#### Add Media to Album
+
+```http
+POST /api/albums/:id/media
+Content-Type: application/json
+
+{
+  "media_id": 5
+}
+```
+
+#### Remove Media from Album
+
+```http
+DELETE /api/albums/:id/media
+Content-Type: application/json
+
+{
+  "media_id": 5
+}
+```
+
+#### Delete Album (Soft Delete)
+
+```http
+DELETE /api/albums/:id
 ```
 
 ### Admin-Only Endpoints

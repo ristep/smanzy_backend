@@ -1,33 +1,50 @@
 ================================================================================
-USER MANAGEMENT API - PROJECT STRUCTURE
+USER MANAGEMENT API WITH MEDIA & ALBUM MANAGEMENT - PROJECT STRUCTURE
 ================================================================================
 
-Project Root: /home/ristep/Development/go/um_starter_jwt_go
+Project Root: /home/ristep/Development/go/smanzary_backend
 
 ================================================================================
 DIRECTORY TREE
 ================================================================================
 
-um_starter_jwt_go/
+smanzy_backend/
 │
 ├── cmd/
 │   └── api/
-│       └── main.go (117 lines)
+│       └── main.go
 │           ├── Environment variable loading
 │           ├── Database connection & migrations
 │           ├── JWT service initialization
+│           ├── Handler initialization
 │           ├── Gin router setup
 │           └── Route definitions
 │
 ├── internal/
 │   │
 │   ├── models/
-│   │   └── user.go (34 lines)
-│   │       ├── User struct (GORM model)
-│   │       └── Role struct (GORM model)
+│   │   ├── user.go
+│   │   │   ├── User struct (GORM model)
+│   │   │   └── Role struct (GORM model)
+│   │   ├── media.go
+│   │   │   └── Media struct with User and Album associations
+│   │   └── album.go
+│   │       └── Album struct with User and Media associations (many-to-many)
+│   │
+│   ├── services/
+│   │   └── album.go
+│   │       ├── AlbumService type
+│   │       ├── CreateAlbum()
+│   │       ├── GetAlbumByID()
+│   │       ├── GetUserAlbums()
+│   │       ├── UpdateAlbum()
+│   │       ├── AddMediaToAlbum()
+│   │       ├── RemoveMediaFromAlbum()
+│   │       ├── DeleteAlbum()
+│   │       └── PermanentlyDeleteAlbum()
 │   │
 │   ├── auth/
-│   │   └── jwt.go (118 lines)
+│   │   └── jwt.go
 │   │       ├── JWTService type
 │   │       ├── CustomClaims struct
 │   │       ├── GenerateTokenPair()
@@ -36,28 +53,67 @@ um_starter_jwt_go/
 │   │       └── ValidateRefreshToken()
 │   │
 │   ├── handlers/
-│   │   └── auth.go (456 lines)
-│   │       ├── AuthHandler type
-│   │       │   ├── RegisterHandler()
-│   │       │   ├── LoginHandler()
-│   │       │   ├── RefreshHandler()
-│   │       │   └── ProfileHandler()
-│   │       └── UserHandler type
-│   │           ├── GetAllUsersHandler()
-│   │           ├── GetUserByIDHandler()
-│   │           ├── UpdateUserHandler()
-│   │           ├── DeleteUserHandler()
-│   │           ├── AssignRoleHandler()
-│   │           └── RemoveRoleHandler()
+│   │   ├── auth.go
+│   │   │   ├── AuthHandler type
+│   │   │   │   ├── RegisterHandler()
+│   │   │   │   ├── LoginHandler()
+│   │   │   │   ├── RefreshHandler()
+│   │   │   │   ├── ProfileHandler()
+│   │   │   │   └── UpdateProfileHandler()
+│   │   │   └── UserHandler type
+│   │   │       ├── GetAllUsersHandler()
+│   │   │       ├── GetUserByIDHandler()
+│   │   │       ├── UpdateUserHandler()
+│   │   │       ├── DeleteUserHandler()
+│   │   │       ├── AssignRoleHandler()
+│   │   │       └── RemoveRoleHandler()
+│   │   │
+│   │   ├── media.go
+│   │   │   └── MediaHandler type
+│   │   │       ├── UploadHandler()
+│   │   │       ├── ListPublicMediasHandler()
+│   │   │       ├── GetMediaHandler()
+│   │   │       ├── GetMediaDetailsHandler()
+│   │   │       ├── UpdateMediaHandler()
+│   │   │       ├── DeleteMediaHandler()
+│   │   │       └── ServeFileHandler()
+│   │   │
+│   │   └── album.go
+│   │       └── AlbumHandler type
+│   │           ├── CreateAlbumHandler()
+│   │           ├── GetAlbumHandler()
+│   │           ├── GetUserAlbumsHandler()
+│   │           ├── UpdateAlbumHandler()
+│   │           ├── AddMediaToAlbumHandler()
+│   │           ├── RemoveMediaFromAlbumHandler()
+│   │           └── DeleteAlbumHandler()
 │   │
 │   └── middleware/
-│       └── auth.go (120 lines)
-│           ├── AuthMiddleware()
-│           ├── RoleMiddleware()
+│       ├── auth.go
+│       │   ├── AuthMiddleware()
+│       │   ├── RoleMiddleware()
+│       │   └── ErrorResponse struct
+│       └── cors.go
 │           └── CORSMiddleware()
 │
-├── go.mod (module definition & dependencies)
-├── go.sum (dependency checksums)
+├── uploads/                        # Local storage for media files
+│
+├── go.mod                          # Go module definition & dependencies
+├── go.sum                          # Dependency checksums
+├── .env                            # Environment configuration (not in repo)
+├── .env.example                    # Example environment variables
+├── Makefile                        # Development tasks
+├── docker-compose.yml              # PostgreSQL + pgAdmin services
+├── smanzy_collection.json          # Postman/Insomnia API collection
+│
+├── migrations/                     # Database migrations (if using SQL migrations)
+│
+├── README.md                       # Complete API documentation
+├── PROJECT_SUMMARY.md              # Project overview and features
+├── PROJECT_STRUCTURE.txt           # This file
+├── QUICKSTART.md                   # Quick start guide
+├── TESTING.md                      # API testing guide
+└── WARP.md                         # Development workflow notes
 ├── .env (environment variables - local)
 ├── .env.example (environment template)
 ├── .gitignore (git ignore rules)
