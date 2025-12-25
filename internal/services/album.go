@@ -97,11 +97,17 @@ func (as *AlbumService) AddMediaToAlbum(albumID, mediaID uint) error {
 		return err
 	}
 
-	// Add media to album using association
+	// Load the album first
 	album := &models.Album{}
+	if err := as.db.First(album, albumID).Error; err != nil {
+		return err
+	}
+
+	// Create media reference with just the ID
 	media := &models.Media{ID: mediaID}
 
-	if err := as.db.Model(album).Where("id = ?", albumID).Association("MediaFiles").Append(media); err != nil {
+	// Add media to album using association
+	if err := as.db.Model(album).Association("MediaFiles").Append(media); err != nil {
 		return err
 	}
 
@@ -118,11 +124,14 @@ func (as *AlbumService) RemoveMediaFromAlbum(albumID, mediaID uint) error {
 		return err
 	}
 
-	// Remove media from album
-	if err := as.db.Model(&models.Album{}).
-		Where("id = ?", albumID).
-		Association("MediaFiles").
-		Delete(&models.Media{ID: mediaID}); err != nil {
+	// Load the album first
+	album := &models.Album{}
+	if err := as.db.First(album, albumID).Error; err != nil {
+		return err
+	}
+
+	// Remove media from album using association
+	if err := as.db.Model(album).Association("MediaFiles").Delete(&models.Media{ID: mediaID}); err != nil {
 		return err
 	}
 
