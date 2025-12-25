@@ -23,6 +23,12 @@ type Media struct {
 	// json:"-" prevents endless recursion or exposing too much user info when listing media.
 	UploadedBy User `gorm:"foreignKey:UserID" json:"-"`
 
+	// Albums represents the many-to-many relationship with Album
+	// A media file can belong to multiple albums, and an album can contain multiple media files
+	// "many2many:album_media" tells GORM to use the join table named "album_media"
+	// json:"-" prevents endless recursion when listing media
+	Albums []Album `gorm:"many2many:album_media;" json:"-"`
+
 	CreatedAt int64          `gorm:"autoCreateTime:milli" json:"created_at"`
 	UpdatedAt int64          `gorm:"autoUpdateTime:milli" json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`

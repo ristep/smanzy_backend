@@ -56,7 +56,7 @@ func main() {
 	// AutoMigrate automatically updates the database schema (tables) to display
 	// the Go structs defined in `internal/models`.
 	// Be careful with this in production!
-	if err := db.AutoMigrate(&models.User{}, &models.Role{}, &models.Media{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Role{}, &models.Media{}, &models.Album{}); err != nil {
 		log.Fatalf("Failed to auto-migrate models: %v", err)
 	}
 
@@ -74,6 +74,7 @@ func main() {
 	authHandler := handlers.NewAuthHandler(db, jwtService)
 	userHandler := handlers.NewUserHandler(db)
 	mediaHandler := handlers.NewMediaHandler(db)
+	albumHandler := handlers.NewAlbumHandler(db)
 
 	// 7. Router Setup
 	// Create a new Gin router with default middleware (logger and recovery)
@@ -145,6 +146,20 @@ func main() {
 			media.GET("/:id/details", mediaHandler.GetMediaDetailsHandler) // Get file metadata
 			media.PUT("/:id", mediaHandler.UpdateMediaHandler)             // Edit file (Owner or Admin)
 			media.DELETE("/:id", mediaHandler.DeleteMediaHandler)          // Delete file (Owner or Admin)
+		}
+
+		// Album routes (authenticated)
+		albums := protectedAPI.Group("/albums")
+		{
+			albums.POST("", albumHandler.CreateAlbumHandler)       // Create a new album
+			albums.GET("", albumHandler.GetUserAlbumsHandler)      // Get all albums for current user
+			albums.GET("/:id", albumHandler.GetAlbumHandler)       // Get album by ID
+			albums.PUT("/:id", albumHandler.UpdateAlbumHandler)    // Update album details
+			albums.DELETE("/:id", albumHandler.DeleteAlbumHandler) // Delete album (soft delete)
+
+			// Album media management
+			albums.POST("/:id/media", albumHandler.AddMediaToAlbumHandler)        // Add media to album
+			albums.DELETE("/:id/media", albumHandler.RemoveMediaFromAlbumHandler) // Remove media from album
 		}
 
 	}
