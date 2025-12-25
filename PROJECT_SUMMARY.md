@@ -95,7 +95,27 @@ smanzy_backend/
 - Timing-safe password comparison
 - CORS middleware support
 
-### 6. API Routes
+### 6. Media Management
+
+- File upload with unique naming (prevents overwrites)
+- File serving/download capability
+- File metadata storage (MIME type, size, filename)
+- User-owned files (UserID association)
+- Public media listing
+- Soft delete support
+- Media details retrieval
+
+### 7. Album Management
+
+- Create albums with title and description
+- Organize media files into albums
+- Many-to-many relationship between albums and media
+- Add/remove media from albums
+- Soft delete albums
+- User-specific album isolation
+- Album details with associated media
+
+### 8. API Routes
 
 #### Public Routes
 
@@ -103,10 +123,28 @@ smanzy_backend/
 - `POST /api/auth/login` - User login
 - `POST /api/auth/refresh` - Token refresh
 - `GET /health` - Health check
+- `GET /api/media` - Public media listing
+- `GET /api/media/files/:name` - Serve uploaded files
 
 #### Protected Routes (Authenticated)
 
 - `GET /api/profile` - Get current user profile
+- `PUT /api/profile` - Update user profile
+- `POST /api/media` - Upload media file
+- `GET /api/media/:id` - Get media file
+- `GET /api/media/:id/details` - Get media metadata
+- `PUT /api/media/:id` - Update media metadata
+- `DELETE /api/media/:id` - Delete media file
+
+**Album Management Routes (Authenticated)**
+
+- `POST /api/albums` - Create new album
+- `GET /api/albums` - Get all user albums
+- `GET /api/albums/:id` - Get specific album
+- `PUT /api/albums/:id` - Update album details
+- `POST /api/albums/:id/media` - Add media to album
+- `DELETE /api/albums/:id/media` - Remove media from album
+- `DELETE /api/albums/:id` - Delete album (soft delete)
 
 #### Admin-Only Routes
 
@@ -119,11 +157,24 @@ smanzy_backend/
 
 ## Code Organization
 
-### Models (34 lines)
+### Models
 
-- GORM struct definitions for User and Role
-- Proper JSON tags and relationships
-- Field validation and constraints
+- **User** (user.go): User registration, profile, roles with many-to-many relationship
+- **Role** (user.go): Role definition and user association
+- **Media** (media.go): File metadata, owner relationship, many-to-many album association
+- **Album** (album.go): Album structure, creator link, many-to-many media association
+
+### Services
+
+- **AlbumService** (services/album.go): Business logic for album operations
+  - CreateAlbum()
+  - GetAlbumByID()
+  - GetUserAlbums()
+  - UpdateAlbum()
+  - AddMediaToAlbum()
+  - RemoveMediaFromAlbum()
+  - DeleteAlbum() (soft delete)
+  - PermanentlyDeleteAlbum() (hard delete)
 
 ### JWT Service (118 lines)
 
@@ -141,19 +192,39 @@ smanzy_backend/
 - UserHandler: CRUD operations for user management
 - RoleHandler: Role assignment and removal
 
+### Media Handlers
+
+- UploadHandler: File upload with unique naming
+- GetMediaHandler: File retrieval
+- GetMediaDetailsHandler: Metadata retrieval
+- UpdateMediaHandler: Metadata update
+- DeleteMediaHandler: File deletion
+- ListPublicMediasHandler: Public media listing
+- ServeFileHandler: File serving
+
+### Album Handlers
+
+- CreateAlbumHandler: Create new album
+- GetAlbumHandler: Retrieve album details
+- GetUserAlbumsHandler: List user's albums
+- UpdateAlbumHandler: Update album info
+- AddMediaToAlbumHandler: Add media to album
+- RemoveMediaFromAlbumHandler: Remove media from album
+- DeleteAlbumHandler: Delete album (soft delete)
+
 ### Middleware (120 lines)
 
 - AuthMiddleware: JWT extraction, validation, context attachment
 - RoleMiddleware: Role-based access control
 - CORSMiddleware: CORS header handling
 
-### Main Application (117 lines)
+### Main Application
 
 - Environment configuration loading
 - Database connection initialization
 - Auto-migration of models
 - Gin router setup with middleware
-- Route grouping (public, protected, admin)
+- Route grouping (public, protected, admin, albums)
 - Server startup
 
 ## Getting Started
