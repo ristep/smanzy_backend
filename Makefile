@@ -36,7 +36,7 @@ run:
 
 # Development mode with hot reload (requires air)
 dev:
-	@command -v air >/dev/null 2>&1 || go install github.com/air-verse/air@latest
+	@command -v -migrate air >/dev/null 2>&1 || go install github.com/air-verse/air@latest
 	@PATH=$$(go env GOPATH)/bin:$$PATH air
 
 # Run tests
