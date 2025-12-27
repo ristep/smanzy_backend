@@ -34,6 +34,9 @@ go.work
 tmp/
 temp/
 
+# Uploaded media files
+uploads/
+
 # OS files
 .DS_Store
 Thumbs.db
