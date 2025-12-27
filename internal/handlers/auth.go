@@ -429,9 +429,6 @@ func (uh *UserHandler) UpdateUserHandler(c *gin.Context) {
 	if req.Gender != "" {
 		user.Gender = req.Gender
 	}
-	if req.Tel != "" {
-		user.Tel = req.Tel
-	}
 
 	if err := uh.db.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to update user"})

@@ -1,0 +1,34 @@
+Bug List:
+
+1. Duplicate code for updating Tel field in UpdateUserHandler (internal/handlers/auth.go). The if statement for Tel is repeated.
+
+2. Lack of validation for user input fields such as Age (can be negative or zero), Gender (no check for valid values), etc., in registration and update handlers.
+
+3. AutoMigrate is run on every startup in main.go, which can lead to unintended schema changes in production environments.
+
+4. No rate limiting on authentication endpoints, making it vulnerable to brute-force attacks.
+
+5. In DeleteProfileHandler, while roles are cleared, consider if other associations (like media or albums) need cleanup before deletion.
+
+
+Suggestions for Code Improvement:
+
+1. Add comprehensive unit and integration tests for all handlers and services, beyond the existing media_test.go.
+
+2. Implement proper error handling and logging using a structured logging library like zap or logrus.
+
+3. Use a configuration management library (e.g., viper) for better handling of environment variables and config files.
+
+4. Add support for password reset and email verification flows.
+
+5. Implement pagination for list endpoints like GetAllUsersHandler and ListPublicMediasHandler.
+
+6. Use context.Context for database operations to support timeouts and cancellations.
+
+7. Consider adding API documentation using Swagger or similar tools.
+
+8. Enforce HTTPS and add security headers in production.
+
+9. Optimize database queries with proper indexing and eager loading where necessary.
+
+10. Separate concerns further, e.g., move business logic to services layer.

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	// Gin is a web framework for Go (handling HTTP requests/responses)
@@ -14,14 +16,23 @@ import (
 	"gorm.io/gorm"
 
 	// Internal packages from our own project
+	"time"
+
 	"github.com/ristep/smanzy_backend/internal/auth"
 	"github.com/ristep/smanzy_backend/internal/handlers"
 	"github.com/ristep/smanzy_backend/internal/middleware"
 	"github.com/ristep/smanzy_backend/internal/models"
+	"github.com/ulule/limiter/v3"
+	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 // main is the entry point of the application
 func main() {
+	// Parse CLI flags
+	migrate := flag.Bool("migrate", false, "Run database migrations")
+	flag.Parse()
+
 	// 1. Load environment variables from .env file (if it exists)
 	// This allows us to configure the app without changing code (e.g. secret keys, db passwords)
 	if err := godotenv.Load(); err != nil {
@@ -53,11 +64,13 @@ func main() {
 	}
 
 	// 4. Database Migration
-	// AutoMigrate automatically updates the database schema (tables) to display
+	// flagged migration, if specified, flag
 	// the Go structs defined in `internal/models`.
 	// Be careful with this in production!
-	if err := db.AutoMigrate(&models.User{}, &models.Role{}, &models.Media{}, &models.Album{}); err != nil {
-		log.Fatalf("Failed to auto-migrate models: %v", err)
+	if *migrate {
+		if err := db.AutoMigrate(&models.User{}, &models.Role{}, &models.Media{}, &models.Album{}); err != nil {
+			log.Fatalf("Failed to auto-migrate models: %v", err)
+		}
 	}
 
 	log.Println("Database migration completed successfully")
@@ -80,6 +93,14 @@ func main() {
 	// Create a new Gin router with default middleware (logger and recovery)
 	router := gin.Default()
 
+	// Custom handler for rate limit errors
+	router.Use(func(c *gin.Context) {
+		c.Next()
+		if c.Writer.Status() == http.StatusTooManyRequests {
+			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Rate limit exceeded. Try again later."})
+		}
+	})
+
 	// Apply CORS middleware (Cross-Origin Resource Sharing) to allow frontend to talk to backend
 	router.Use(middleware.CORSMiddleware())
 
@@ -87,6 +108,15 @@ func main() {
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
+
+	// Initialize rate limiter (e.g., 5 requests per minute per IP)
+	rate := limiter.Rate{
+		Period: time.Minute,
+		Limit:  15, // Adjust this value as needed
+	}
+	store := memory.NewStore() // Use in-memory for dev; switch to Redis for production
+	limiterInstance := limiter.New(store, rate)
+	rateLimitMiddleware := mgin.NewMiddleware(limiterInstance)
 
 	// 8. Define Routes
 	// Group routes under /api
@@ -96,6 +126,7 @@ func main() {
 		// These endpoints can be accessed without logging in
 
 		auth := api.Group("/auth")
+		auth.Use(rateLimitMiddleware) // Apply rate limiting here
 		{
 			auth.POST("/register", authHandler.RegisterHandler)
 			auth.POST("/login", authHandler.LoginHandler)
