@@ -29,6 +29,7 @@ type Album struct {
 }
 
 // TableName specifies the table name for MediaAlbum
+// yep
 func (Album) TableName() string {
 	return "album"
 }
